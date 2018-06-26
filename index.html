@@ -8,50 +8,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
         crossorigin="anonymous">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+        crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
 
 </head>
 
 <body>
-    <h1>Colby's get a GIF</h1>
-    <form id="input">
-        <button id="search">Get a GIF</button>
-    </form>
-    <div id="gifholder"></div>
+    <div class="container-fluid">
+        <h1>Colby's get a GIF</h1>
+
+
+        <form id="input">
+            <button id="search">Get a GIF</button>
+            <input id="box" type="text"></input>
+        </form>
+        <div id="madebuttn"></div>
+        <div id="gifholder">
+            <div class="row">
+
+            </div>
+        </div>
 
 
 
 
-    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        function getGif(e) {
-            e.preventDefault();
-            var queryURL =
-                "https://api.giphy.com/v1/gifs/search?api_key=HGb5HbGn3oPAxWY8e7ELr5BS8YPK2zig&&q=fail&limit=10&offset=0&rating=PG-13&lang=en";
+        <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            function getGif(e) {
+                e.preventDefault();
+                var keyWord = $("#box").val();
+                var queryURL =
+                    "https://api.giphy.com/v1/gifs/search?api_key=HGb5HbGn3oPAxWY8e7ELr5BS8YPK2zig&&q=" + keyWord +
+                    "&limit=10&offset=0&rating=PG-13&lang=en";
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function (response) {
+                    $("#gifholder").empty();
+                    var rating = response.rating;
+                    console.log(response);
+                    $("#madebuttn").append("<button id='" + keyWord + "' > " + keyWord + "</button>");
+                    for (let i = 0; i < response.data.length; i++) {
+                        let curURL = response.data[i].images.original_still.url;
+                        let curIMG = "<img id = 'gif" + i + "' src ='" + curURL +
+                            "' height = '225px' width = '225px' >";
+                        $("#gifholder").append(curIMG);
+                        $("#gif" + i).on("click", function () {
+                            let movURL = response.data[i].images.original.url;
+                            $(this).prop("src", $(this).prop("src") === curURL ? movURL : curURL);
+                        })
+                    }
 
-            $.ajax({
-                url: queryURL,
-                method: "GET"
-            }).then(function (response) {
-                var rating = response.rating;
-                console.log(response.data);
-                for (let i = 0; i < response.data.length; i++) {
-                    let curURL = response.data[i].images.original_still.url;
-                    let curIMG = "<img id = 'gif" + i + "' src ='" + curURL + "' height = '245px' >";
-                    $("#gifholder").append(curIMG);
-                    $("#gif" + i).on("click", function () {
-                        let movURL = response.data[i].images.original.url;
-                        $(this).prop("src", $(this).prop("src") === curURL ? movURL : curURL);
-                    })
-                }
-
-            }, function () {
-                alert("here");
-            })
-        }
-        $("#search").on("click", getGif);
-    </script>
+                }, function () {
+                    alert("here");
+                })
+            }
+            $("#search").on("click", getGif);
+        </script>
 </body>
 
 </html>
