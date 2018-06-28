@@ -17,27 +17,23 @@
 <body>
     <div class="container-fluid">
         <h1>Colby's get a GIF</h1>
-
-
         <form id="input">
-            <button id="search">Get a GIF</button>
             <input id="box" type="text"></input>
+            <button id="search">Get a GIF</button>
         </form>
         <div id="madebuttn"></div>
         <div id="gifholder">
             <div class="row">
-
             </div>
         </div>
-
-
-
-
         <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
         <script type="text/javascript">
+            var keyWords = new Set();
+
             function getGif(e) {
                 e.preventDefault();
-                var keyWord = $("#box").val();
+                var keyWord = $(this).hasClass("get") ? $(this).text().trim() : $("#box").val().trim();
+                console.log(keyWords.has(keyWord));
                 var queryURL =
                     "https://api.giphy.com/v1/gifs/search?api_key=HGb5HbGn3oPAxWY8e7ELr5BS8YPK2zig&&q=" + keyWord +
                     "&limit=10&offset=0&rating=PG-13&lang=en";
@@ -45,24 +41,31 @@
                     url: queryURL,
                     method: "GET"
                 }).then(function (response) {
-                    $("#gifholder").empty();
-                    var rating = response.rating;
-                    console.log(response);
-                    $("#madebuttn").append("<button id='" + keyWord + "' > " + keyWord + "</button>");
-                    for (let i = 0; i < response.data.length; i++) {
-                        let curURL = response.data[i].images.original_still.url;
-                        let curIMG = "<img id = 'gif" + i + "' src ='" + curURL +
-                            "' height = '225px' width = '225px' >";
-                        $("#gifholder").append(curIMG);
-                        $("#gif" + i).on("click", function () {
-                            let movURL = response.data[i].images.original.url;
-                            $(this).prop("src", $(this).prop("src") === curURL ? movURL : curURL);
-                        })
-                    }
+                        $("#gifholder").empty();
+                        var rating = response.rating;
+                        console.log(response);
+                        if (!keyWords.has(keyWord)) {
+                            keyWords.add(keyWord);
+                            $("#madebuttn").append("<button class ='get' id='" + keyWord + "' > " + keyWord +
+                                "</button>");
 
-                }, function () {
-                    alert("here");
-                })
+                            $(".get").one("click", getGif);
+                        }
+                            for (let i = 0; i < response.data.length; i++) {
+                                let curURL = response.data[i].images.original_still.url;
+                                let curIMG = "<img id = 'gif" + i + "' src ='" + curURL +
+                                    "' height = '225px' width = '225px' >";
+                                $("#gifholder").append(curIMG);
+                                $("#gif" + i).on("click", function () {
+                                    let movURL = response.data[i].images.original.url;
+                                    $(this).prop("src", $(this).prop("src") === curURL ? movURL : curURL);
+                                })
+                            }
+                        
+                    },
+                    function () {
+                        alert("here");
+                    })
             }
             $("#search").on("click", getGif);
         </script>
